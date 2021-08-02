@@ -10,21 +10,45 @@
     <context:annotation-config/>
     <context:component-scan base-package="config,repository,controller,component"/>
     
+    
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="smtp.gmail.com"/>
+        <property name="port" value="587"/>
+        <property name="username" value="luuvanloc197@gmail.com"/>
+        <property name="password" value="Hoiphuthuy1"/>
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.transport.protocol">smtp</prop>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.debug">true</prop>
+                <prop key="mail.smtp.ssl.trust">smtp.gmail.com</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="preConfiguredMessage" class="org.springframework.mail.SimpleMailMessage">
+        <property name="to" value="${newOrder.getUser().getCustomer().getEmail()}"></property>
+        <property name="from" value="luuvanloc197@gmail.com"></property>
+    </bean>
+    
+    <bean id="messageSource"
+              class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="message" />
+    </bean>
+    
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/jsp/"/> 
         <property name="suffix" value=".jsp" />
     </bean>
+    
     <bean id="multipartResolver"
           class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+    
     <mvc:resources mapping="/resources/**" location="/resources/" cache-period="31556926" />
     <mvc:resources mapping="/images/**" location="/images/" />
     <mvc:default-servlet-handler />
     <mvc:annotation-driven />
     
-    <bean class="org.springframework.web.servlet.view.XmlViewResolver">
-        <property name="location">
-            <value>/WEB-INF/spring-excel-views.xml</value>
-        </property>
-        <property name="order" value="0" />
-    </bean>
+    
 </beans>

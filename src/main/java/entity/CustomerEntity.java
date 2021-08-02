@@ -1,52 +1,45 @@
-
 package entity;
 
 import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
+
+
 import org.springframework.format.annotation.DateTimeFormat;
 
-
 @Entity
-@Table (name="customer")
+@Table(name = "customer")
 public class CustomerEntity {
-    @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private int customerId;
-    private String customerName;
-    private String customerAddress;
-    private String customerPhone;
-    private String customerEmail;
-    private String sex;
-    
-    @DateTimeFormat(pattern ="yyyy-MM-dd")
-    private LocalDate customerBirthDate;
 
-    @OneToMany(mappedBy = "customer",fetch = FetchType.LAZY)
-    private List<UserEntity> userList;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int customerId;
+
+    @NotEmpty
+    private String name;
+    @NotEmpty
+    private String address;
+    @NotEmpty
+    private String phoneNumber;
+    @Email(message = "Please enter correct email")
+    private String email;
     
-    @OneToMany(mappedBy = "customer",fetch = FetchType.LAZY)
-    private List<OrdersEntity> orderList;
+   
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthdate;
+
+   @OneToMany(mappedBy = "customer")
+    private List<UserEntity> user;
 
     public CustomerEntity() {
-    }
-
-    public CustomerEntity(int customerId, String customerName, String customerAddress, String customerPhone, String customerEmail, String sex, LocalDate customerBirthDate, List<UserEntity> userList, List<OrdersEntity> orderList) {
-        this.customerId = customerId;
-        this.customerName = customerName;
-        this.customerAddress = customerAddress;
-        this.customerPhone = customerPhone;
-        this.customerEmail = customerEmail;
-        this.sex = sex;
-        this.customerBirthDate = customerBirthDate;
-        this.userList = userList;
-        this.orderList = orderList;
     }
 
     public int getCustomerId() {
@@ -57,68 +50,57 @@ public class CustomerEntity {
         this.customerId = customerId;
     }
 
-    public String getCustomerName() {
-        return customerName;
+    public String getName() {
+        return name;
     }
 
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getCustomerAddress() {
-        return customerAddress;
+    public String getAddress() {
+        return address;
     }
 
-    public void setCustomerAddress(String customerAddress) {
-        this.customerAddress = customerAddress;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public String getCustomerPhone() {
-        return customerPhone;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setCustomerPhone(String customerPhone) {
-        this.customerPhone = customerPhone;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
-    public String getCustomerEmail() {
-        return customerEmail;
+    public String getEmail() {
+        return email;
     }
 
-    public void setCustomerEmail(String customerEmail) {
-        this.customerEmail = customerEmail;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public String getSex() {
-        return sex;
+    public LocalDate getBirthdate() {
+        return birthdate;
     }
 
-    public void setSex(String sex) {
-        this.sex = sex;
+    public void setBirthdate(LocalDate birthdate) {
+        this.birthdate = birthdate;
     }
 
-    public LocalDate getCustomerBirthDate() {
-        return customerBirthDate;
+    public List<UserEntity> getUser() {
+        return user;
     }
 
-    public void setCustomerBirthDate(LocalDate customerBirthDate) {
-        this.customerBirthDate = customerBirthDate;
+    public void setUser(List<UserEntity> user) {
+        this.user = user;
     }
 
-    public List<UserEntity> getUserList() {
-        return userList;
-    }
+    
+   
 
-    public void setUserList(List<UserEntity> userList) {
-        this.userList = userList;
-    }
-
-    public List<OrdersEntity> getOrderList() {
-        return orderList;
-    }
-
-    public void setOrderList(List<OrdersEntity> orderList) {
-        this.orderList = orderList;
-    }
+   
 
 }

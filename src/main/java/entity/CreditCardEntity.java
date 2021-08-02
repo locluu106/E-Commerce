@@ -21,7 +21,7 @@ public class CreditCardEntity {
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private int creditCardId;
     private String creditCardName;
-    private String creditCardNumber;
+    private String cardNumber;
     private double amount;
     private String securityCode;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -75,13 +75,15 @@ public class CreditCardEntity {
         this.creditCardName = creditCardName;
     }
 
-    public String getCreditCardNumber() {
-        return creditCardNumber;
+    public String getCardNumber() {
+        return cardNumber;
     }
 
-    public void setCreditCardNumber(String creditCardNumber) {
-        this.creditCardNumber = creditCardNumber;
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
     }
+
+    
 
     public List<PaymentEntity> getPaymentList() {
         return paymentList;

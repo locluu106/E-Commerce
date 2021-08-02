@@ -4,12 +4,9 @@ package entity;
 
 import java.util.List;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -17,13 +14,14 @@ import javax.persistence.Table;
 @Table (name="user_roles")
 public class UserRoleEntity {
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue (strategy = GenerationType.AUTO)
     private int userRoleId;
     private String role;
     private String  username;
+
     
-    @OneToMany(mappedBy = "user_roles",fetch = FetchType.LAZY)
-    private List<UserEntity> userList;
+    @OneToMany(mappedBy = "user_roles")
+    private List<UserEntity> user;
 
     public UserRoleEntity() {
     }
@@ -56,13 +54,17 @@ public class UserRoleEntity {
 
     
 
-    public List<UserEntity> getUserList() {
-        return userList;
+    public List<UserEntity> getUser() {
+        return user;
     }
 
-    public void setUserList(List<UserEntity> userList) {
-        this.userList = userList;
+    public void setUser(List<UserEntity> user) {
+        this.user = user;
     }
+
+    
+
+    
 
     
 }

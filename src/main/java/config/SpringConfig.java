@@ -2,8 +2,10 @@
 package config;
 
 import java.util.Properties;
+
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -21,16 +23,15 @@ public class SpringConfig {
     DataSource dataSource(){
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/fashiondb");
+         dataSource.setUrl("jdbc:mysql://localhost:3306/EcomDB");
         dataSource.setUsername("root");
         dataSource.setPassword("123123123");
         
         return dataSource;
     }
-    @Bean //entity manager
+    @Bean(name = "entityManagerFactory")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource){
-        LocalContainerEntityManagerFactoryBean entityManager = 
-                new LocalContainerEntityManagerFactoryBean();
+        LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
         entityManager.setDataSource(dataSource);
         entityManager.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         entityManager.setPackagesToScan("entity");
@@ -38,6 +39,8 @@ public class SpringConfig {
         Properties jpaProperties = new Properties();
         jpaProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
         jpaProperties.setProperty("hibernate.hmb2ddl.auto", "update");
+        jpaProperties.setProperty("hibernate.show_sql", "true");
+	jpaProperties.setProperty("hibernate.format_sql", "true");
         entityManager.setJpaProperties(jpaProperties);
         
         return entityManager;

@@ -1,81 +1,267 @@
-
-
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib uri="http://www.springframework.org/tags/form" prefix="mvc" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html class="no-js" lang="en">
-    <!--<![endif]-->
-
+<html lang="en">
     <head>
-        <title>Fashion Hub</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta charset="utf-8" />
-        <meta name="keywords" content="Fashion Hub Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template, 
-              SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony Ericsson, Motorola web design" />
-        <script>
-            addEventListener("load", function () {
-                setTimeout(hideURLbar, 0);
-            }, false);
-
-            function hideURLbar() {
-                window.scrollTo(0, 1);
-            }
-        </script>
-        <link href="css/bootstrap.css" type="text/css" rel="stylesheet" media="all">
-        <link href="css/shop.css" type="text/css" rel="stylesheet" media="all">
-        <link rel="stylesheet" href="css/owl.carousel.min.css">
-        <link href="css/style.css" type="text/css" rel="stylesheet" media="all">
-        <link href="css/fontawesome-all.min.css" rel="stylesheet">
-        <link href="//fonts.googleapis.com/css?family=Elsie+Swash+Caps:400,900" rel="stylesheet">
-        <link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,200i,300,300i,400,400i,600,600i,700,700i,900,900i" rel="stylesheet">
+        <title>Đăng nhập</title>
+        <!-- Google font -->
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap.min.css"/>    
+        <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/slick.css"/>
+        <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/slick-theme.css" media="all"/>
+        <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/nouislider.min.css"/>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/font-awesome.min.css">
+        <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"  media="all"/>     
     </head>
-
-    <body>   
-        <div>
-            <div class="agilemodal-dialog modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1>
-                            <a class="navbar-brand" href="${pageContext.request.contextPath}/home">fh
-                            </a>
-                        </h1>
-                        <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+    <body>
+        <!-- HEADER -->
+        <header>
+            <!-- TOP HEADER -->
+            <div id="top-header">
+                <div class="container">
+                    <c:if test="${pageContext.request.userPrincipal.name == null}">
+                        <ul class="header-links pull-right">                  
+                            <li><a href="${pageContext.request.contextPath}/cart"><i class="fa fa-shopping-cart"></i></a></li>
+                        </ul>
+                        <ul class="header-links pull-right">                  
+                            <li><a href="${pageContext.request.contextPath}/user/homeUser"><i class="fa fa-sign-in"></i>Đăng nhập&emsp;&emsp;</a></li>
+                        </ul>
+                     
+                        <ul class="header-links pull-right">                  
+                            <li><a href="${pageContext.request.contextPath}/register"><i class="fa fa-registered"></i>Đăng Kí&emsp;&emsp;</a></li>
+                        </ul>
                         
-                    </div>
-                    <div class="modal-body  pt-3 pb-5 px-sm-5">
-                        <div class="row">
-                            <div class="col-md-6 align-self-center">
-                                <img src="images/p3.png" class="img-fluid" alt="login_image" />
+                    </c:if>
+                    <c:if test="${pageContext.request.userPrincipal.name != null}">
+                        <ul class="header-links pull-left">                        
+                            <li><a href="${pageContext.request.contextPath}/logout"><i class="fa fa-sign-out"></i>Đăng xuất</a></li>
+                        </ul>
+                    </c:if>
+                </div>
+            </div>
+            <div id="header">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="header-logo">
+                                <a href="${pageContext.request.contextPath}/home" class="logo">
+                                    <img src="${pageContext.request.contextPath}/img/bin.png" width="50%" alt="">
+                                </a>
                             </div>
-                            <div class="col-md-6">
-                                <form action="j_spring_security_check" method="post">
-                                    <div class="form-group">
-                                        <label for="recipient-name" class="col-form-label">User Name</label>
-                                        <input type="text" name="username" required="true"/>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-form-label">Password</label>
-
-                                        <input type="password" name="password" required="true"/><br>
-                                    </div>
-                                    <div class="right-w3l">
-                                        <input type="submit" class="form-control" value="Login">
-                                        <input type="hidden" name="${_csrf.parameterName}" 
-                                               value="${_csrf.token}"/>
-                                    </div>
-                                </form>
-                                    <a href="${pageContext.request.contextPath}/register">
-                                        <p>Do not have an account ?<i>sign up</i></p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="header-search">
+                                <mvc:form action="${pageContext.request.contextPath}/search" method="get"  >   
+                                    <input class="input"  name ="searchText" type="text" value="${searchText}"  placeholder="bạn tìm gì..">
+                                    <button class="search-btn">Tìm</button>
+                                </mvc:form>
+                            </div>
+                        </div>
+                        <div class="col-md-3 clearfix">
+                            <div class="header-ctn">
+                                <div class="menu-toggle">
+                                    <a href="#">
+                                        <i class="fa fa-bars"></i>
+                                        <span>Menu</span>
                                     </a>
-                                <c:if test="${not empty SPRING_SECURITY_LAST_EXCEPTION}">
-                                    <p style="color:red;">Error:
-                                        <c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}"/></p>
-                                    </c:if> 
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>  
-    </body>
+        </header>
+        <nav id="navigation">
+            <div class="container">
+                <div id="responsive-nav">
+                    <ul class="main-nav nav navbar-nav">
+                        <li class="active"><a href="${pageContext.request.contextPath}/home">Home</a></li>
+                            <c:forEach var="category" items="${category}">
+                            <li>
+                                <a href="${pageContext.request.contextPath}/category/${category.name}">${category.name}</a></li>
+                            </c:forEach>  
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div id="breadcrumb" class="section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb-tree">
+                            <label for="create-account">
+                                <span></span>
+                            </label>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <form action="j_spring_security_check" method="post">			
+                                <div class="caption">
+                                    <p>Nhập tài khoản</p>
+                                    <input class="input" type="text" name="username" placeholder="Enter Your Username" required>
+                                    <input class="input" type="password" name="password" placeholder="Enter Your Password" required>
+                                </div>
+                                <div class="row">
+                                    <div class="newsletter">
+                                        <button class="newsletter-btn"><i class="fa fa-sign-in"></i> Đăng nhập</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <c:if test="${not empty SPRING_SECURITY_LAST_EXCEPTION}">
+                                <p style="color:red;">Error:
+                                    <c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}"/></p>
+                                </c:if> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<div id="newsletter" class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="newsletter">
+                    <p></p>
+                    <form>
+                    </form>
+                    <ul class="newsletter-follow">
+                        <li>
+                            <a href="#"><i class="fa fa-facebook"></i></a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-twitter"></i></a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-instagram"></i></a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-pinterest"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
+<!-- /NEWSLETTER -->
+
+<!-- FOOTER -->
+<footer id="footer">
+    <!-- top footer -->
+    <div class="section">
+        <!-- container -->
+        <div class="container">
+            <!-- row -->
+            <div class="row">
+                <div class="col-md-3 col-xs-6">
+                    <div class="footer">
+                        <h3 class="footer-title">About Us</h3>
+                        <p></p>
+                        <ul class="footer-links">
+                            <li><a href="#"><i class="fa fa-map-marker"></i>Morocco</a></li>
+                            <li><a href="#"><i class="fa fa-phone"></i>+212696805712</a></li>
+                            <li><a href="#"><i class="fa fa-envelope-o"></i>ihssanehatim@gmail.com</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-xs-6">
+                    <div class="footer">
+                        <h3 class="footer-title">Categories</h3>
+                        <ul class="footer-links">
+                            <li><a href="#">Hot deals</a></li>
+                            <li><a href="#">Laptops</a></li>
+                            <li><a href="#">Smartphones</a></li>
+                            <li><a href="#">Cameras</a></li>
+                            <li><a href="#">Accessories</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="clearfix visible-xs"></div>
+
+                <div class="col-md-3 col-xs-6">
+                    <div class="footer">
+                        <h3 class="footer-title">Information</h3>
+                        <ul class="footer-links">
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Orders and Returns</a></li>
+                            <li><a href="#">Terms & Conditions</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-xs-6">
+                    <div class="footer">
+                        <h3 class="footer-title">Service</h3>
+                        <ul class="footer-links">
+                            <li><a href="#">My Account</a></li>
+                            <li><a href="#">View Cart</a></li>
+                            <li><a href="#">Wishlist</a></li>
+                            <li><a href="#">Track My Order</a></li>
+                            <li><a href="#">Help</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- /row -->
+        </div>
+        <!-- /container -->
+    </div>
+    <!-- /top footer -->
+
+    <!-- bottom footer -->
+    <div id="bottom-footer" class="section">
+        <div class="container">
+            <!-- row -->
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <ul class="footer-payments">
+                        <li><a href="#"><i class="fa fa-cc-visa"></i></a></li>
+                        <li><a href="#"><i class="fa fa-credit-card"></i></a></li>
+                        <li><a href="#"><i class="fa fa-cc-paypal"></i></a></li>
+                        <li><a href="#"><i class="fa fa-cc-mastercard"></i></a></li>
+                        <li><a href="#"><i class="fa fa-cc-discover"></i></a></li>
+                        <li><a href="#"><i class="fa fa-cc-amex"></i></a></li>
+                    </ul>
+                    <span class="copyright">
+                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                        Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved  <i class="fa fa-heart-o" aria-hidden="true"></i> by IHSSANE HATIM
+                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    </span>
+                </div>
+            </div>
+            <!-- /row -->
+        </div>
+        <!-- /container -->
+    </div>
+    <!-- /bottom footer -->
+</footer>
+<!-- /FOOTER -->
+
+<!-- jQuery Plugins -->
+<script src="${pageContext.request.contextPath}/js/jquery.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/slick.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/nouislider.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/jquery.zoom.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
+
+</body>
 </html>

@@ -6,18 +6,21 @@ import entity.CustomerEntity;
 import entity.OrderDetailsEntity;
 import entity.OrdersEntity;
 import entity.PaymentEntity;
-import entity.ProductDetailsEntity;
+import entity.ProductEntity;
+
 import entity.UserEntity;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
-import javafx.beans.binding.Bindings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,17 +32,13 @@ import repository.OrderDetailsRepository;
 
 import repository.OrdersRepository;
 import repository.PaymentRepository;
-import repository.ProductDetailsRepository;
-import repository.SexRepository;
+import repository.ProductRepository;
 import repository.UserRepository;
 
 @Controller
 @Scope("session")
 @RequestMapping(value = "/")
 public class ShopingController {
-
-    @Autowired
-    ProductDetailsRepository productDetailsRepo;
 
     @Autowired
     CartComponent cart;
@@ -60,96 +59,116 @@ public class ShopingController {
     OrderDetailsRepository orderDetailsRepo;
 
     @Autowired
-    SexRepository sexRepo;
+    ProductRepository productRepo;
 
     @Autowired
     UserRepository userRepo;
 
-    @RequestMapping(value = "/addToCart/{productDetailsId}", method = RequestMethod.GET)
-    public String addToCart(@PathVariable(value = "productDetailsId") int productDetailsId, Model model) {
-        ProductDetailsEntity productDetails = (ProductDetailsEntity) productDetailsRepo.findByProductDetailsId(productDetailsId);
-        cart.addItems(productDetails);
-        model.addAttribute("order", cart.getOrder());
+    @Autowired
+    JavaMailSender javaMailSender;
 
-        return "/checkout/cart";
+    @RequestMapping(value = "/addToCart/{productId}", method = RequestMethod.GET)
+    public String addToCart(@PathVariable(value = "productId") int productId, Model model) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user = userRepo.findByusername(userName);
+
+        if (user == null) {
+            ProductEntity product = productRepo.findByProductId(productId);
+            cart.addItems(product);
+            model.addAttribute("order", cart.getOrder());
+
+            return "redirect:/cart";
+        }
+        ProductEntity product = productRepo.findByProductId(productId);
+        cart.addItems(product);
+        model.addAttribute("order", cart.getOrder());
+        String lastName = user.getUsername();
+        model.addAttribute("lastName", lastName);
+        return "redirect:/cart";
     }
 
     @RequestMapping(value = "/cart", method = RequestMethod.GET)
     public String showCart(Model model) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user = userRepo.findByusername(userName);
+
+        if (user == null) {
+            model.addAttribute("order", cart.getOrder());
+        return "/cart";
+        }
+        String lastName = user.getUsername();
+        model.addAttribute("lastName", lastName);
         model.addAttribute("order", cart.getOrder());
-        return "/checkout/cart";
+        return "/cart";
     }
 
-    @RequestMapping(value = "/homepage", method = RequestMethod.GET)
-    public String returnHome(Model model) {
-        List<ProductDetailsEntity> productDetailsList = (List<ProductDetailsEntity>) productDetailsRepo.getShowHomeProductLimit10();
-        cart.getOrder().getOrderDetailsList().clear();
-        
-        return "redirect:/";
-    }
+    @RequestMapping(value = "/remove/{productId}", method = RequestMethod.GET)
+    public String removeItems(@PathVariable(value = "productId") int productId, Model model) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user = userRepo.findByusername(userName);
 
-    @RequestMapping(value = "/remove/{productDetailsId}", method = RequestMethod.GET)
-    public String removeItems(@PathVariable(value = "productDetailsId") int productDetailsId, Model model) {
-        ProductDetailsEntity productDetails = (ProductDetailsEntity) productDetailsRepo.findByProductDetailsId(productDetailsId);
-        cart.removeItems(productDetails);
+        if (user == null) {
+            ProductEntity product = productRepo.findByProductId(productId);
+            cart.removeItems(product);
+            model.addAttribute("order", cart.getOrder());
+
+            return "redirect:/cart";
+        }
+
+        ProductEntity product = productRepo.findByProductId(productId);
+        cart.removeItems(product);
         model.addAttribute("order", cart.getOrder());
-
-        return "/checkout/cart";
+        String lastName = user.getUsername();
+        model.addAttribute("lastName", lastName);
+        return "redirect:/cart";
     }
 
-    @RequestMapping(value = "/update/{productDetailsId}", method = RequestMethod.POST)
-    public String updateQuantity(@PathVariable(name = "productDetailsId") int productDetailsId,
+    @RequestMapping(value = "/update/{productId}", method = RequestMethod.POST)
+    public String updateQuantity(@PathVariable(name = "productId") int productId,
             @RequestParam(name = "quantity") int quantity,
-            Model model, ProductDetailsEntity productDetails) {
+            Model model, ProductEntity product) {
 
-        List<OrderDetailsEntity> orderDetailList = cart.getOrder().getOrderDetailsList();
+        List<OrderDetailsEntity> orderDetailList = cart.getOrder().getOrderDetails();
+        ProductEntity quantityProduct = productRepo.findByProductId(productId);
+        int x = quantityProduct.getNumberProduct();
+        if (x < quantity) {
+            model.addAttribute("errorMessage", "Số Lượng Không Đủ, còn " + x + " sản phẩm");
+            model.addAttribute("order", cart.getOrder());
+            return "/cart";
+        }
         for (int i = 0; i < orderDetailList.size(); i++) {
             OrderDetailsEntity orderDetails = orderDetailList.get(i);
-            if (orderDetails.getProductDetails().getProductDetailsId() == productDetails.getProductDetailsId()) {
+            if (orderDetails.getProduct().getProductId() == product.getProductId()) {
                 OrderDetailsEntity orderDetail = orderDetailList.get(i);
                 orderDetail.setQuantity(quantity);
-                cart.getOrder().getOrderDetailsList().set(i, orderDetail);
-                cart.getOrder().setOrderDetailsList(orderDetailList);
+                cart.getOrder().getOrderDetails().set(i, orderDetail);
+                cart.getOrder().getOrderDetails();
             }
         }
         model.addAttribute("order", cart.getOrder());
 
-        return "/checkout/cart";
+        return "/cart";
     }
 
-    @RequestMapping(value = "/inforCustomer", method = RequestMethod.GET)
-    public String showFormCustomer(Model model) {
-        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserEntity user = userRepo.getCustomerByUserName(userName);
-        List<OrderDetailsEntity> orderDetailsList = cart.getOrder().getOrderDetailsList();
+    @RequestMapping(value = "/order", method = RequestMethod.GET)
+    public String checkOrder(Model model) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user = userRepo.findByusername(username);
+        List<OrderDetailsEntity> orderDetailsList = cart.getOrder().getOrderDetails();
         if (orderDetailsList.isEmpty()) {
-            model.addAttribute("errorMessage", "Your cart is empty");
-            return "/checkout/cart";
+            model.addAttribute("errorMessage", "Giỏ hàng hiện đang trống!");
+            return "/cart";
         } else if (user == null) {
-            CustomerEntity customer = new CustomerEntity();
-            String[] sex = {"Men", "Women"};
-            model.addAttribute("sex", sex);
-            model.addAttribute("customer", customer);
-            return "/checkout/check";
+            model.addAttribute("order", cart.getOrder());
+            return "/login";
+
         } else {
-            model.addAttribute("users", user);
-            return "/checkout/payment";
+
+            cart.getOrder().setUser(user);
+            model.addAttribute("order", cart.getOrder());
+            return "/checkout";
 
         }
-    }
-
-    @RequestMapping(value = "/payment", method = RequestMethod.POST)
-    public String infoCustomer(CustomerEntity customer, Model model) {
-        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserEntity user = userRepo.getCustomerByUserName(userName);
-        if (user == null) {
-            cart.getOrder().setCustomer(customer);
-            model.addAttribute("cart", cart.getOrder());
-            return "/checkout/payment";
-        } else {
-            return "/checkout/payment";
-        }
-
     }
 
     @RequestMapping(value = "/paymentProduct", method = RequestMethod.POST)
@@ -159,73 +178,65 @@ public class ShopingController {
             @RequestParam(name = "exDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date expirationDate, Model model) {
 
         LocalDate exDate = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(expirationDate));
-        CreditCardEntity card = cardRepo.getPayment(creditCardName, creditCardNumber, exDate, securityCode);
+        CreditCardEntity CreditCard = cardRepo.getPayment(creditCardName, creditCardNumber, exDate, securityCode);
 
-        if (card == null) {
-            model.addAttribute("errorMessage", "Wrong card information please re-enter");
-            return "/checkout/payment";           
+        if (CreditCard == null) {
+            model.addAttribute("order", cart.getOrder());
+            model.addAttribute("errorMessage", "Thông tin thẻ sai vui lòng nhập lại");
+            return "/checkout";
         } else {
             //check amout in credit
             double total = cart.getOrder().getTotal();
-            if (total >= card.getAmount()) {            
-                model.addAttribute("errorMessage", "payment amount is not enoug");
-                return "/checkout/payment";                
-            } else {                
-                String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-                UserEntity user = userRepo.getCustomerByUserName(userName);
-                if (user == null) {
-                    double blance = card.getAmount() - total;
-                    card.setAmount(blance);
-                    cardRepo.save(card);
+            if (total >= CreditCard.getAmount()) {
+                model.addAttribute("order", cart.getOrder());
+                model.addAttribute("errorMessage", "Số tiền thanh toán không đủ");
+                return "/checkout";
+            } else {
+                double blance = CreditCard.getAmount() - total;
+                CreditCard.setAmount(blance);
+                cardRepo.save(CreditCard);
 
-                    CustomerEntity newCustomer = cart.getOrder().getCustomer();
-                    customerRepo.save(newCustomer);
+                OrdersEntity newOrder = cart.getOrder();
+                newOrder.setUser(cart.getOrder().getUser());
+                newOrder.setOrderDate(LocalDate.now());
 
-                    OrdersEntity newOrders = cart.getOrder();
-                    newOrders.setCustomer(newCustomer);
-                    newOrders.setOrderDate(LocalDate.now());
-                    orderRepo.save(newOrders);
+                newOrder.setOrderStatus("Pending");
+                orderRepo.save(newOrder);
 
-                    PaymentEntity payment = new PaymentEntity();
-                    payment.setOrders(newOrders);
-                    payment.setCreditCard(card);
-                    payment.setPaymentDate(LocalDate.now());
-                    paymentRepo.save(payment);
+                PaymentEntity payment = new PaymentEntity();
+                payment.setOrders(newOrder);
+                payment.setCreditCard(CreditCard);
+                payment.setPaymentDate(LocalDate.now());
+                payment.setAmount(total);
+                paymentRepo.save(payment);
 
-                    List<OrderDetailsEntity> orderDetailsList = cart.getOrder().getOrderDetailsList();
-                    for (OrderDetailsEntity od : orderDetailsList) {
-                        od.setOrders(newOrders);
+                List<OrderDetailsEntity> list = cart.getOrder().getOrderDetails();
+                for (OrderDetailsEntity od : list) {
+                    od.setOrders(newOrder);
 
-                        orderDetailsRepo.save(od);
-                    }
+                    orderDetailsRepo.save(od);
 
-                } else {
-
-                    double blance = card.getAmount() - total;
-                    card.setAmount(blance);
-                    cardRepo.save(card);
-
-                    OrdersEntity newOrders = cart.getOrder();
-                    newOrders.setCustomer(user.getCustomer());
-                    newOrders.setOrderDate(LocalDate.now());
-                    orderRepo.save(newOrders);
-
-                    PaymentEntity payment = new PaymentEntity();
-                    payment.setOrders(newOrders);
-                    payment.setCreditCard(card);
-                    payment.setPaymentDate(LocalDate.now());
-                    paymentRepo.save(payment);
-                    
-                    List<OrderDetailsEntity> orderDetailsList = cart.getOrder().getOrderDetailsList();
-                    for (OrderDetailsEntity od : orderDetailsList) {
-                        od.setOrders(newOrders);
-
-                        orderDetailsRepo.save(od);
-                    }
                 }
-                cart.getOrder().getOrderDetailsList().clear();
-                return "/thanks";
+                for (OrderDetailsEntity order : list) {
+                    int i = order.getProduct().getProductId();
+                    ProductEntity product = productRepo.findByProductId(i);
+                    int qttO = order.getQuantity();
+                    int qttP = product.getNumberProduct();
+                    int rest = qttP - qttO;
+                    product.setNumberProduct(rest);
+                    productRepo.save(product);
+                }
+
+                SimpleMailMessage mess = new SimpleMailMessage();
+                mess.setTo(newOrder.getUser().getCustomer().getEmail());
+                mess.setSubject("Bin Mobile");
+                mess.setText("BAN DA DAT HANG THANH CONG \n"
+                        + newOrder.getOrderDetails().toString());
+                javaMailSender.send(mess);
             }
+
+            cart.getOrder().getOrderDetails().clear();
+            return "/thank";
 
         }
     }

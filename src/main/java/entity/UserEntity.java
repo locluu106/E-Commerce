@@ -1,29 +1,37 @@
 
 package entity;
 
-import java.util.List;
+import java.io.Serializable;
+import java.time.LocalDate;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table (name="user")
-public class UserEntity {
+public class UserEntity implements Serializable {
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue (strategy = GenerationType.AUTO)
     private int userId;
+    @NotEmpty
     private String username;
+    @NotEmpty
     private String password;
+    
+   @NotNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate registerDate;
+   @NotNull
     private int enabled;
     
-    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
-    private List<CommentEntity> commentList;
+    
     
     @ManyToOne
     @JoinColumn(name="userRoleId")
@@ -34,6 +42,16 @@ public class UserEntity {
     private CustomerEntity customer;
 
     public UserEntity() {
+    }
+
+    public UserEntity(int userId, String username, String password, LocalDate registerDate, int enabled, UserRoleEntity user_roles, CustomerEntity customer) {
+        this.userId = userId;
+        this.username = username;
+        this.password = password;
+        this.registerDate = registerDate;
+        this.enabled = enabled;
+        this.user_roles = user_roles;
+        this.customer = customer;
     }
 
     public int getUserId() {
@@ -48,14 +66,6 @@ public class UserEntity {
         return username;
     }
 
-    public int getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(int enabled) {
-        this.enabled = enabled;
-    }
-
     public void setUsername(String username) {
         this.username = username;
     }
@@ -68,12 +78,20 @@ public class UserEntity {
         this.password = password;
     }
 
-    public List<CommentEntity> getCommentList() {
-        return commentList;
+    public LocalDate getRegisterDate() {
+        return registerDate;
     }
 
-    public void setCommentList(List<CommentEntity> commentList) {
-        this.commentList = commentList;
+    public void setRegisterDate(LocalDate registerDate) {
+        this.registerDate = registerDate;
+    }
+
+    public int getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(int enabled) {
+        this.enabled = enabled;
     }
 
     public UserRoleEntity getUser_roles() {
@@ -90,11 +108,7 @@ public class UserEntity {
 
     public void setCustomer(CustomerEntity customer) {
         this.customer = customer;
-    }
-
-    
-
-    
+    }    
     
     
 }

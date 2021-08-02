@@ -7,21 +7,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 public interface OrderDetailsRepository extends CrudRepository<OrderDetailsEntity, Integer> {
-    
-    @Query(value = "SELECT * FROM fashiondb.orders "
-            + "o join fashiondb.orderdetails f "
-            + "on o.orderId=f.orderId "
-            + "where o.orderId=?1", nativeQuery = true)
+
+    @Query(value = "SELECT * FROM ecomdb.orders "
+            + "o join ecomdb.orderdetails f "
+            + "on o.ordersId=f.ordersId "
+            + "where o.ordersId=?1", nativeQuery = true)
     List<OrderDetailsEntity> getOrderUser(int id);
-    
-    @Query(value = "SELECT * FROM fashiondb.orderdetails od"
-            + "join fashiondb.orders o"
-            + "on o.orderId=od.orderId =?1"
-            + "where o.orderId=?1", nativeQuery = true)    
+
+    @Query(value = "SELECT * FROM ecomdb.orderdetails orderDetails "
+            + "join ecomdb.orders order_1 "
+            + "on orderDetails.ordersId = order_1.ordersId "
+            + "where orderdetails.ordersId=?1", nativeQuery = true)
     List<OrderDetailsEntity> getOrderDetails(int orderId);
+
     
-    @Query(value = "SELECT * FROM fashiondb.orders o join fashiondb.orderdetails f on o.orderId=f.orderId where o.orderId=?1", nativeQuery = true)
-    List<OrderDetailsEntity> getOrderDetailsfindOrders(int id);
-    
-    
+
 }

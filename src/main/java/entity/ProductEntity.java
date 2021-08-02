@@ -1,62 +1,43 @@
-
 package entity;
 
-import java.util.List;
+import java.text.NumberFormat;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
-@Table (name="product")
+@Table(name = "product")
 public class ProductEntity {
+
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int productId;
-    private String productName;
-    private String productCode;
-    private String productMaterial ;
-    private String productBrand;
-    
-    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
-    private List<ProductDetailsEntity> productDetailsList;
-    
-    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
-    private List<CommentEntity> commentList;
-    
-    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
-    private List<PromotionEntity> promotionList;
-    
-    
+    @NotEmpty
+    private String name;
+    @NotEmpty
+    private String ram;
+    @NotEmpty
+    private String color;
+    @NotEmpty
+    private String images;
+    @NotNull
+    private double price;
+    @NotNull
+    private int numberProduct;
+
+    @ManyToOne
+    @JoinColumn(name = "categoryId")
+    private CategoryEntity category;
+
     public ProductEntity() {
     }
 
-    public ProductEntity(int productId, String productName, String productCode, String productMaterial, String productBrand, List<ProductDetailsEntity> productDetailsList, List<CommentEntity> commentList, List<PromotionEntity> promotionList) {
-        this.productId = productId;
-        this.productName = productName;
-        this.productCode = productCode;
-        this.productMaterial = productMaterial;
-        this.productBrand = productBrand;
-        this.productDetailsList = productDetailsList;
-        this.commentList = commentList;
-        this.promotionList = promotionList;
-    }
-
-    public String getProductMaterial() {
-        return productMaterial;
-    }
-
-    public void setProductMaterial(String productMaterial) {
-        this.productMaterial = productMaterial;
-    }
-
-    
-    
     public int getProductId() {
         return productId;
     }
@@ -65,63 +46,68 @@ public class ProductEntity {
         this.productId = productId;
     }
 
-    public String getProductName() {
-        return productName;
+    public String getName() {
+        return name;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getProductCode() {
-        return productCode;
+    public String getRam() {
+        return ram;
     }
 
-    public void setProductCode(String productCode) {
-        this.productCode = productCode;
+    public void setRam(String ram) {
+        this.ram = ram;
     }
 
-    public String getProductMaterail() {
-        return productMaterial;
+
+    public String getColor() {
+        return color;
     }
 
-    public void setProductMaterail(String productMaterail) {
-        this.productMaterial = productMaterail;
+    public void setColor(String color) {
+        this.color = color;
     }
 
-    public String getProductBrand() {
-        return productBrand;
+    public String getImages() {
+        return images;
     }
 
-    public void setProductBrand(String productBrand) {
-        this.productBrand = productBrand;
+    public void setImages(String images) {
+        this.images = images;
     }
 
-    public List<ProductDetailsEntity> getProductDetailsList() {
-        return productDetailsList;
+    public double getPrice() {
+        return price;
     }
 
-    public void setProductDetailsList(List<ProductDetailsEntity> productDetailsList) {
-        this.productDetailsList = productDetailsList;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
-    public List<CommentEntity> getCommentList() {
-        return commentList;
+    public int getNumberProduct() {
+        return numberProduct;
     }
 
-    public void setCommentList(List<CommentEntity> commentList) {
-        this.commentList = commentList;
+    public void setNumberProduct(int numberProduct) {
+        this.numberProduct = numberProduct;
     }
 
-    public List<PromotionEntity> getPromotionList() {
-        return promotionList;
+    public CategoryEntity getCategory() {
+        return category;
     }
 
-    public void setPromotionList(List<PromotionEntity> promotionList) {
-        this.promotionList = promotionList;
+    public void setCategory(CategoryEntity category) {
+        this.category = category;
     }
-
+public String getPriceFormatted() {
+        NumberFormat numberFormat = NumberFormat.getNumberInstance();
+        return numberFormat.format(price);
+    }
    
+
     
-    
+
 }

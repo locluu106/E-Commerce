@@ -1,9 +1,9 @@
-
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Fashion Hub Ecommerce Category Bootstrap Responsive Website Template| Payment :: w3layouts</title>
+        <title>Thông tin cá nhân</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="utf-8" />
         <meta name="keywords" content="Fashion Hub Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template, 
@@ -18,39 +18,21 @@
             }
         </script>
 
-        <link href="<c:url value='/resources/css/owl.carousel.min.css.css'/>" rel="stylesheet">                               
-        <link href="<c:url value='/resources/css/bootstrap.css'/>" rel="stylesheet">        
-        <link href="<c:url value='/resources/css/shop.css'/>" rel="stylesheet">
-
-        <link href="<c:url value='/resources/css/style.css'/>" rel="stylesheet" media="all">  
-        <link href="<c:url value='/resources/css/fontawesome-all.min.css.css'/>" rel="stylesheet">  
-        <link href="<c:url value='/resources/css/chekcout.css'/>" rel="stylesheet">  
-
-        <link href="css/style.css" type="text/css" rel="stylesheet" media="all">    
-        <link href="css/fontawesome-all.min.css" rel="stylesheet" media="all">
-        <link href="css/chekcout.css" rel="stylesheet">
-        <link href="//fonts.googleapis.com/css?family=Elsie+Swash+Caps:400,900" rel="stylesheet">
-        <link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,200i,300,300i,400,400i,600,600i,700,700i,900,900i" rel="stylesheet">
-
+        <link href="${pageContext.request.contextPath}/css/bootstrap.css" type="text/css" rel="stylesheet" media="all">
+        <link href="${pageContext.request.contextPath}/css/shop.css" type="text/css" rel="stylesheet" media="all">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}css/owl.carousel.min.css">
+        <link href="${pageContext.request.contextPath}/css/style.css" type="text/css" rel="stylesheet" media="all">
+        <link href="${pageContext.request.contextPath}/css/fontawesome-all.min.css" rel="stylesheet">
     </head>
 
     <body>
         <jsp:include page="../homeHeader.jsp" />
-        <div class="ibanner_w3 pt-sm-5 pt-3">
-            <h4 class="head_agileinfo text-center text-capitalize text-center pt-5">
-                <span>f</span>ashion
-                <span>h</span>ub</h4>
-        </div>
+        <div class="w3-content w3-section"  >
+                <img class="mySlides" src="${pageContext.request.contextPath}/images/slider/hinh-anh-banner.png" alt="Men slide img" style="width:100%; height: 300px">
 
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="${pageContext.request.contextPath}/home">Home</a>
-                </li>
-                <li class="breadcrumb-item active" aria-current="page">User</li>
-            </ol>
-        </nav>
+            </div>
 
+       
         <section class="payment_w3ls py-5">
             <div class="container">
                 <div class="privacy about">
@@ -66,19 +48,19 @@
 
                                             <div class="col-xs-12 col-sm-4 col-md-3"  >
                                                 <div class="list-group">
-                                                    <a href="${pageContext.request.contextPath}/user/infomation" class="list-group-item ">Information</a>
-                                                    <a href="${pageContext.request.contextPath}/user/userOrder"class="list-group-item ">Order or You</a>
-                                                    <a href="${pageContext.request.contextPath}/logout" class="list-group-item logout active">Logout</a>
+                                                    <a href="${pageContext.request.contextPath}/user/homeUser" class="list-group-item ">Tài khoản</a>
+                                                    <a href="${pageContext.request.contextPath}/user/userOrder"class="list-group-item ">Đơn hàng</a>
+                                                    <a href="${pageContext.request.contextPath}/logout" class="list-group-item logout active">Đăng xuất</a>
                                                 </div>
                                             </div>
                                             <div>
+                                                    
 
-
-                                                <a class="list-group-item">Name : ${users.customer.customerName}</a>
-                                                <a class="list-group-item">Address : ${users.customer.customerAddress}</a>
-                                                <a class="list-group-item">Email : ${users.customer.customerEmail}</a>
-                                                <a class="list-group-item">Phone : ${users.customer.customerPhone}</a>
-                                                <a class="list-group-item">Phone : ${users.customer.customerBirthDate}</a>
+                                                <a class="list-group-item">Tài khoản : ${user.username}</a>
+                                                <a class="list-group-item">Tên : ${user.customer.name}</a>
+                                                <a class="list-group-item">Email : ${user.customer.email}</a>
+                                                <a class="list-group-item">Số điện thoại : ${user.customer.phoneNumber}</a>
+                                                <a class="list-group-item">Địa chỉ : ${user.customer.address}</a>
 
                                             </div>
                                         </div>

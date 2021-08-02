@@ -2,7 +2,8 @@ package component;
 
 import entity.OrderDetailsEntity;
 import entity.OrdersEntity;
-import entity.ProductDetailsEntity;
+import entity.ProductEntity;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.context.annotation.Scope;
@@ -17,7 +18,7 @@ public class CartComponent {
     public CartComponent() {
         order = new OrdersEntity();
         List<OrderDetailsEntity> orderDetailsList = new ArrayList<>();
-        order.setOrderDetailsList(orderDetailsList);
+        order.setOrderDetails(orderDetailsList);
     }
 
     public OrdersEntity getOrder() {
@@ -28,32 +29,38 @@ public class CartComponent {
         this.order = order;
     }
 
-    public void addItems(ProductDetailsEntity productDetails) {
+    public void addItems(ProductEntity product) {
         boolean t = false;
-        for (int i = 0; i < order.getOrderDetailsList().size(); i++) {
-            OrderDetailsEntity orderDetails = order.getOrderDetailsList().get(i);
-            if (orderDetails.getProductDetails().getProductDetailsId() == productDetails.getProductDetailsId()) {
+        for (int i = 0; i < order.getOrderDetails().size(); i++) {
+            OrderDetailsEntity orderDetails = order.getOrderDetails().get(i);
+            if (orderDetails.getProduct().getProductId() == product.getProductId()) {
                 orderDetails.setQuantity(orderDetails.getQuantity() + 1);
-                order.getOrderDetailsList().set(i, orderDetails);
+                order.getOrderDetails().set(i, orderDetails);
                 t = true;
             }
         }
         if (!t) {
             OrderDetailsEntity orderDetails = new OrderDetailsEntity();
-            orderDetails.setProductDetails(productDetails);
+            orderDetails.setProduct(product);
             orderDetails.setQuantity(1);
-            orderDetails.setUnitPrice(productDetails.getPrice());
-            order.getOrderDetailsList().add(orderDetails);
+            orderDetails.setPrice(product.getPrice());
+            order.getOrderDetails().add(orderDetails);
         }
     }
 
-    public void removeItems(ProductDetailsEntity productDetails) {
-        for (int i = 0; i < order.getOrderDetailsList().size(); i++) {
-            OrderDetailsEntity orderDetails = order.getOrderDetailsList().get(i);
-            if (orderDetails.getProductDetails().getProductDetailsId() == productDetails.getProductDetailsId()) {
-                order.getOrderDetailsList().remove(i);
+    public void removeItems(ProductEntity product) {
+        for (int i = 0; i < order.getOrderDetails().size(); i++) {
+            OrderDetailsEntity orderDetails = order.getOrderDetails().get(i);
+            if (orderDetails.getProduct().getProductId() == product.getProductId()) {
+                order.getOrderDetails().remove(i);
             }
         }
-    }   
+    }
+
+    public int getCount() {
+
+        int count = order.getOrderDetails().size();
+        return count;
+    }
 
 }

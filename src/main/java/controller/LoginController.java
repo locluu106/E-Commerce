@@ -1,13 +1,14 @@
 package controller;
 
+import entity.CategoryEntity;
 import entity.CustomerEntity;
 import entity.OrderDetailsEntity;
 import entity.OrdersEntity;
-import entity.ProductDetailsEntity;
+
 import entity.ProductEntity;
 import entity.UserEntity;
 import entity.UserRoleEntity;
-import static java.util.Collections.list;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,10 +17,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import repository.CategoryRepository;
 import repository.CustomerRepository;
 import repository.OrderDetailsRepository;
 import repository.OrdersRepository;
-import repository.ProductDetailsRepository;
+
 import repository.ProductRepository;
 import repository.UserRepository;
 import repository.UserRoleRepository;
@@ -31,7 +33,7 @@ public class LoginController {
     CustomerRepository customerRepo;
 
     @Autowired
-    ProductDetailsRepository productDetailsRepo;
+    private CategoryRepository categoryRepo;
 
     @Autowired
     UserRepository userRepo;
@@ -44,10 +46,9 @@ public class LoginController {
 
     @Autowired
     ProductRepository productRepo;
-    
+
     @Autowired
     OrderDetailsRepository OrderDetailsRepo;
-    
 
     @RequestMapping(value = "/register", method = RequestMethod.GET)
     public String ShowRegister(Model model) {
@@ -62,6 +63,7 @@ public class LoginController {
 
     @RequestMapping(value = "/newUser", method = RequestMethod.POST)
     public String newUser(Model model, UserEntity user) {
+
         UserEntity users = userRepo.findByusername(user.getUsername());
         if (users == null) {
             UserRoleEntity userRole = new UserRoleEntity();
@@ -69,103 +71,85 @@ public class LoginController {
             userRole.setUsername(user.getUsername());
 
             user.setEnabled(1);
+            user.setRegisterDate(LocalDate.now());
             user.setUser_roles(userRole);
 
             CustomerEntity customer = user.getCustomer();
             customerRepo.save(customer);
             userRoleRepo.save(userRole);
             userRepo.save(user);
-            
-            
-            
-            String errorMessage1 = "successful registration";
-            model.addAttribute("errorMessage1", errorMessage1);
-            return "/register";
+
+            return "/login";
 
         } else {
             String errorMessage = "User name already exists";
             model.addAttribute("errorMessage", errorMessage);
-
             UserRoleEntity userRole = new UserRoleEntity();
             CustomerEntity customer = new CustomerEntity();
             user.setCustomer(customer);
             user.setUser_roles(userRole);
             model.addAttribute("user", user);
-            return "/register";
+            return "/account";
         }
     }
-    
-    
 
     @RequestMapping(value = "user/homeUser", method = RequestMethod.GET)
     public String showPage(Model model) {
 
-        String lastName = "";
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user = userRepo.findByusername(userName);
 
-        UserEntity user = userRepo.getCustomerByUserName(userName);
-        lastName = user.getUsername();
+        int userId = user.getUserId();
 
-        model.addAttribute("lastName", lastName);
-        return "user/homeUser";
+        List<OrdersEntity> ordersList = orderRepo.getOrderByUser(userId);
+        model.addAttribute("ordersList", ordersList);
+        model.addAttribute("user", user);
+        return "/viewOrder";
     }
 
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     public String showHome(Model model) {
 
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserEntity user = userRepo.getCustomerByUserName(userName);
-
+        UserEntity user = userRepo.findByusername(userName);
         if (user == null) {
-            List<ProductDetailsEntity> productDetailsList = (List<ProductDetailsEntity>) productDetailsRepo.getShowHomeProductLimit10();
-            List<ProductEntity> productList = (List<ProductEntity>) productRepo.findAll();
-            model.addAttribute("productList", productList);
-            model.addAttribute("productDetailsList", productDetailsList);
+            List<CategoryEntity> category = (List<CategoryEntity>) categoryRepo.findAll();
+            List<ProductEntity> product = (List<ProductEntity>) productRepo.findAll();
+            List<ProductEntity> productSale = (List<ProductEntity>) productRepo.productSale();
+            model.addAttribute("productSale", productSale);
+            model.addAttribute("category", category);
+            model.addAttribute("product", product);
         } else {
             String lastName = "";
-            List<ProductDetailsEntity> productDetailsList = (List<ProductDetailsEntity>) productDetailsRepo.getShowHomeProductLimit10();
-            List<ProductEntity> productList = (List<ProductEntity>) productRepo.findAll();
-            model.addAttribute("productList", productList);
-            model.addAttribute("productDetailsList", productDetailsList);
             lastName = user.getUsername();
+            List<CategoryEntity> category = (List<CategoryEntity>) categoryRepo.findAll();
+            List<ProductEntity> product = (List<ProductEntity>) productRepo.findAll();
+            List<ProductEntity> productSale = (List<ProductEntity>) productRepo.productSale();
+            model.addAttribute("productSale", productSale);
+            model.addAttribute("product", product);
+            model.addAttribute("category", category);
             model.addAttribute("lastName", lastName);
         }
-        return "/home";
-    }
-
-    @RequestMapping(value = "/user/infomation", method = RequestMethod.GET)
-    public String showInfomation(Model model) {
-
-        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserEntity user = userRepo.getCustomerByUserName(userName);
-
-        model.addAttribute("users", user);
-
-        return "user/homeUser";
+        return "/index";
     }
 
     @RequestMapping(value = "/user/userOrder", method = RequestMethod.GET)
     public String ShowUserOrder(Model model) {
-
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserEntity user = userRepo.getCustomerByUserName(userName);
-        int customerId = user.getCustomer().getCustomerId();
+        UserEntity user = userRepo.findByusername(userName);
+
         int userId = user.getUserId();
-        //String
-        List<OrdersEntity> ordersList = orderRepo.getOrderByUser(userId, customerId);
 
+        List<OrdersEntity> ordersList = orderRepo.getOrderByUser(userId);
         model.addAttribute("ordersList", ordersList);
-
-        return "/user/userOrder";
+        return "/viewOrder";
     }
-    
+
     @RequestMapping(value = "/viewOrder/{id}", method = RequestMethod.GET)
     public String viewOrder(@PathVariable(value = "id") int orderId, Model model) {
-
-       List<OrderDetailsEntity> orderList = (List<OrderDetailsEntity>) OrderDetailsRepo.getOrderUser(orderId);
+        List<OrderDetailsEntity> orderList = (List<OrderDetailsEntity>) OrderDetailsRepo.getOrderUser(orderId);
         model.addAttribute("orderList", orderList);
-        return "/user/userOrderDetails";
+        return "/viewOrderDetails";
     }
 
-    
 }
